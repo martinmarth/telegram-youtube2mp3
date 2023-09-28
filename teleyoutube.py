@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 bot = telebot.TeleBot(os.environ.get("TOKEN"))
+out_path = 'out.mp3'
+log_path = 'logs/my.log'
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message: telebot.types.Message):
@@ -18,9 +20,20 @@ def handle_urls(message: telebot.types.Message):
         prompt = "yt-dlp -4 -o 'out.%(ext)s' --extract-audio --audio-format mp3 {} --rm-cache-dir".format(message.text)
         print(prompt)
         os.system(prompt)
-        audio = open('out.mp3', 'rb')
-        bot.send_audio(chat_id=message.chat.id, audio=audio)
-
+        if os.path.isfile(out_path):
+            audio = open(out_path, 'rb')
+            bot.send_audio(chat_id=message.chat.id, audio=audio)
+            os.remove(out_path)
+        else:
+            error_message = "Something went wrong"
+            if os.path.isfile(log_path):
+                with open(log_path, 'r') as f:
+                    log = f.read()
+                    f.close()
+                error_message += "\n"
+                error_message += log
+                
+            bot.reply_to(message, error_message)
     else:
         bot.reply_to(message, "Please send a valid youtube url!")
 
