@@ -15,7 +15,7 @@ def handle_urls(message: telebot.types.Message):
     pattern = r'^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/.+'
     if re.match(pattern, message.text):
         bot.reply_to(message, "Song is being downloaded, please wait")
-        prompt = "youtube-dl -4 -o 'out.%(ext)s' --extract-audio --audio-format mp3 {} --rm-cache-dir".format(message.text)
+        prompt = "yt-dlp -4 -o 'out.%(ext)s' --extract-audio --audio-format mp3 {} --rm-cache-dir".format(message.text)
         print(prompt)
         os.system(prompt)
         audio = open('out.mp3', 'rb')
